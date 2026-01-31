@@ -1,0 +1,138 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #d0e5fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* MAIN PAGE WIDTH */
+.container {
+    max-width: 1100px;   /* makes it desktop-like */
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+/* HEADER */
+h1 {
+    text-align: center;
+    color: #0b3d91;
+    background-color: #e3ecff; 
+    padding: 30px 0;          
+    border-radius: 12px;
+}
+
+
+p {
+    text-align: center;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* LAYOUT: TWO COLUMNS */
+.main-content {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* LEFT & RIGHT PANELS */
+.form-container,
+.track-container {
+    flex: 1;
+    padding: 25px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+/* FORM STYLING */
+.form-container h2,
+.track-container h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+label {
+    display: block;
+    margin: 12px 0 6px;
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: horizontal;
+}
+
+/* BUTTONS */
+.btn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #1976d2;
+    color: white;
+}
+
+#trackBtn {
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+#trackBtn:hover {
+    background-color: darkorange;
+}
+
+/* OUTPUT BOXES */
+.grievance-info {
+    margin-top: 20px;
+    background-color: #e7f3ff;
+    padding: 15px;
+    border-left: 5px solid #0b3d91;
+    border-radius: 6px;
+}
+
+.track-result {
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+/* RESPONSIVE (mobile fallback) */
+@media (max-width: 900px) {
+    .main-content {
+        flex-direction: column;
+    }
+}
+.choice-box {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.btn-track {
+    background-color: orange;
+    color: white;
+}
+
