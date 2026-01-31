@@ -28,21 +28,25 @@ body {
 .main-container {
   display: flex;
   justify-content: center;
+  padding: 0 40px; /* This ensures the 40px margin on left and right */
+  width: 100%;
 }
 
 .dashboard-container {
-  width: 80%;
+  width: 100%; /* Changed from 80% to 100% to fill the space */
+  max-width: 100%; /* Ensures it doesn't shrink */
   background: white;
   border-radius: 8px;
   box-shadow: 0 6px 15px rgba(0,0,0,.12);
+  margin-bottom: 40px; /* Optional: adds 40px at the bottom too */
 }
-
 .dashboard-header {
   background: #f7931e;
   color: white;
   padding: 20px;
   display: flex;
   justify-content: space-between;
+  align-self: center;
 }
 
 .section-title {
