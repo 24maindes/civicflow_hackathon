@@ -1,3 +1,18 @@
+// ---------- FIREBASE CONFIG ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyB72IUqfi0iBLZfkMYlYejToOaL13wB2wc",
+  authDomain: "civicflow-17d38.firebaseapp.com",
+  projectId: "civicflow-17d38",
+  storageBucket: "civicflow-17d38.firebasestorage.app",
+  messagingSenderId: "1040325288838",
+  appId: "1:1040325288838:web:6bf24f9147a62beee38207"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth(); // Added Firebase Auth
+
 // ---------- ELEMENTS ----------
 const submitChoice = document.getElementById("submitChoice");
 const trackChoice = document.getElementById("trackChoice");
@@ -13,21 +28,23 @@ const trackBtn = document.getElementById("trackBtn");
 const trackIdInput = document.getElementById("trackId");
 const trackResult = document.getElementById("trackResult");
 
+// Signup elements
+const signupForm = document.getElementById("signupForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const roleInput = document.getElementById("role");
+
 // ---------- INITIAL STATE ----------
 formContainer.style.display = "none";
 trackContainer.style.display = "none";
 historyBox.style.display = "none";
 
 // ---------- DATA ----------
-// Load previous complaints from localStorage
 const storedHistory = localStorage.getItem("grievanceHistory");
 const grievanceHistory = storedHistory ? JSON.parse(storedHistory) : [];
 
-// Map for quick lookup by ID
 const submittedGrievances = {};
-grievanceHistory.forEach(g => {
-    submittedGrievances[g.id] = g;
-});
+grievanceHistory.forEach(g => submittedGrievances[g.id] = g);
 
 let grievanceCounter = grievanceHistory.length > 0 
     ? parseInt(grievanceHistory[grievanceHistory.length - 1].id.replace("GRV", "")) 
@@ -49,8 +66,7 @@ submitChoice.addEventListener("click", () => {
     formContainer.style.display = "block";
     trackContainer.style.display = "none";
     historyBox.style.display = "block";
-
-    showHistory(); // show all previous complaints immediately
+    showHistory();
 });
 
 trackChoice.addEventListener("click", () => {
@@ -58,6 +74,37 @@ trackChoice.addEventListener("click", () => {
     formContainer.style.display = "none";
     historyBox.style.display = "none";
 });
+
+// ---------- SIGNUP FUNCTION ----------
+window.signup = async function() {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    const role = roleInput.value;
+
+    if(!email || !password || !role){
+        alert("Please fill all signup fields!");
+        return;
+    }
+
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Save role in Firestore
+        await db.collection("users").doc(user.uid).set({
+            email: email,
+            role: role
+        });
+
+        alert("Signup successful!");
+        emailInput.value = "";
+        passwordInput.value = "";
+        roleInput.value = "";
+    } catch(error){
+        console.error(error);
+        alert("Signup failed: " + error.message);
+    }
+}
 
 // ---------- SUBMIT GRIEVANCE ----------
 form.addEventListener("submit", (e) => {
@@ -94,6 +141,12 @@ form.addEventListener("submit", (e) => {
     // Save updated history to LocalStorage
     localStorage.setItem("grievanceHistory", JSON.stringify(grievanceHistory));
 
+    // Add to Firebase
+    db.collection("grievances").add({
+        ...grievanceObj,
+        createdAt: new Date()
+    });
+
     grievanceInfo.innerHTML = `
         <h3>✅ Grievance Submitted</h3>
         <p><b>Grievance ID:</b> ${grievanceID}</p>
@@ -103,7 +156,7 @@ form.addEventListener("submit", (e) => {
         <p><b>SLA:</b> ${dept.sla} days</p>
     `;
 
-    showHistory(); // refresh history after submission
+    showHistory();
     form.reset();
 });
 

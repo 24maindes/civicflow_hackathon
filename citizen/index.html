@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citizen Grievance Portal</title>
     <link rel="stylesheet" href="Citizen_page.css">
+
+    <!-- Firebase SDKs for compat + auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 </head>
 <body>
     <div class="container">
@@ -12,10 +17,31 @@
         <p>Report Public Issues Easily.</p>
 
         <div class="choice-box">
-    <button id="submitChoice" class="btn btn-primary">Submit Grievance</button>
-    <button id="trackChoice" class="btn btn-track">Track Grievance</button>
+            <button id="submitChoice" class="btn btn-primary">Submit Grievance</button>
+            <button id="trackChoice" class="btn btn-track">Track Grievance</button>
         </div>
 
+        <!-- Signup Section -->
+        <div class="form-container">
+            <h2>Signup</h2>
+            <form id="signupForm">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Enter email" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+
+                <label for="role">Role:</label>
+                <select id="role" required>
+                    <option value="">--Select Role--</option>
+                    <option value="citizen">Citizen</option>
+                    <option value="officer">Officer</option>
+                    <option value="admin">Admin</option>
+                </select>
+
+                <button type="button" onclick="signup()" class="btn btn-primary">Signup</button>
+            </form>
+        </div>
 
         <!-- MAIN HORIZONTAL CONTENT -->
         <div class="main-content">
@@ -39,9 +65,9 @@
 
                     <label for="pincode">Pincode:</label>
                     <input type="text" id="pincode" placeholder="Enter Pincode" required>
+
                     <label for="area">Area / Locality:</label>
                     <input type="text" id="area" placeholder="Enter Area or Locality" required>
-
 
                     <label for="description">Description:</label>
                     <textarea id="description" placeholder="Describe your issue..." required></textarea>
@@ -51,7 +77,6 @@
 
                 <div id="grievanceInfo" class="grievance-info"></div>
                 <div id="historyBox" class="grievance-info"></div>
-
             </div>
 
             <!-- Track Grievance Section -->

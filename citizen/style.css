@@ -1,3 +1,4 @@
+/* ---------- GENERAL STYLING ---------- */
 body {
     font-family: Arial, sans-serif;
     background-color: #d0e5fa;
@@ -23,7 +24,6 @@ h1 {
     padding: 30px 0;          
     border-radius: 12px;
 }
-
 
 p {
     text-align: center;
@@ -124,6 +124,8 @@ textarea {
         flex-direction: column;
     }
 }
+
+/* BUTTON CHOICE BOX */
 .choice-box {
     display: flex;
     justify-content: center;
@@ -136,3 +138,12 @@ textarea {
     color: white;
 }
 
+/* SIGNUP FORM STYLING */
+#signupForm {
+    margin-bottom: 40px;
+}
+
+#signupForm input, 
+#signupForm select {
+    margin-bottom: 15px;
+}
