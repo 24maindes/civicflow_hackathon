@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Grievance Portal</title>
+    <link rel="stylesheet" href="Citizen_page.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Citizen Grievance Portal</h1>
+        <p>Report Public Issues Easily.</p>
+
+        <div class="choice-box">
+    <button id="submitChoice" class="btn btn-primary">Submit Grievance</button>
+    <button id="trackChoice" class="btn btn-track">Track Grievance</button>
+        </div>
+
+
+        <!-- MAIN HORIZONTAL CONTENT -->
+        <div class="main-content">
+
+            <!-- Submit Grievance Form -->
+            <div class="form-container">
+                <h2>Submit Your Grievance</h2>
+                <form id="grievanceForm">
+                    <label for="category">Category:</label>
+                    <select id="category" required>
+                        <option value="">--Select Category--</option>
+                        <option value="Road & Transport">Road & Transport</option>
+                        <option value="Water Supply">Water Supply</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Health Services">Health Services</option>
+                        <option value="Garbage Management">Garbage Management</option>
+                        <option value="Education Services">Education Services</option>
+                        <option value="Gas Services">Gas Services</option>
+                        <option value="Public safety">Public safety</option>
+                    </select>
+
+                    <label for="pincode">Pincode:</label>
+                    <input type="text" id="pincode" placeholder="Enter Pincode" required>
+                    <label for="area">Area / Locality:</label>
+                    <input type="text" id="area" placeholder="Enter Area or Locality" required>
+
+
+                    <label for="description">Description:</label>
+                    <textarea id="description" placeholder="Describe your issue..." required></textarea>
+
+                    <button type="submit" class="btn btn-primary">Submit Grievance</button>
+                </form>
+
+                <div id="grievanceInfo" class="grievance-info"></div>
+                <div id="historyBox" class="grievance-info"></div>
+
+            </div>
+
+            <!-- Track Grievance Section -->
+            <div class="track-container">
+                <h3>Track Your Grievance</h3>
+                <input type="text" id="trackId" placeholder="Enter Grievance ID">
+                <button id="trackBtn" type="button">Track Grievance</button>
+
+                <div id="trackResult" class="track-result"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="Citizen_page.js"></script>
+</body>
+</html>
