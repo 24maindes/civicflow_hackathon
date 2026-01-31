@@ -55,7 +55,7 @@
   <button onclick="login()">Login</button>
 
   <p>Don’t have an account?
-    <a href="SignUp_page.html">Sign Up</a>
+    <a href="SignIn_page.html">Sign Up</a>
   </p>
 </div>
 
@@ -79,7 +79,7 @@
   // 🔁 If already logged in → redirect
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      window.location.href = "PersonalDetails_page.html";
+      window.location.href = "Personal_details.html";
     }
   });
 
@@ -93,7 +93,7 @@
 
       if (snap.exists()) {
         alert("Welcome " + snap.data().name);
-        window.location.href = "PersonalDetails_page.html";
+        window.location.href = "Personal_details.html";
       } else {
         alert("User profile not found");
       }
