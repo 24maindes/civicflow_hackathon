@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citizen Grievance Portal</title>
-    <link rel="stylesheet" href="Citizen_page.css">
+    <link rel="stylesheet" href="style.css">
 
-    <!-- Firebase SDKs for compat + auth -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 </head>
 <body>
     <div class="container">
@@ -19,28 +18,6 @@
         <div class="choice-box">
             <button id="submitChoice" class="btn btn-primary">Submit Grievance</button>
             <button id="trackChoice" class="btn btn-track">Track Grievance</button>
-        </div>
-
-        <!-- Signup Section -->
-        <div class="form-container">
-            <h2>Signup</h2>
-            <form id="signupForm">
-                <label for="email">Email:</label>
-                <input type="email" id="email" placeholder="Enter email" required>
-
-                <label for="password">Password:</label>
-                <input type="password" id="password" placeholder="Enter password" required>
-
-                <label for="role">Role:</label>
-                <select id="role" required>
-                    <option value="">--Select Role--</option>
-                    <option value="citizen">Citizen</option>
-                    <option value="officer">Officer</option>
-                    <option value="admin">Admin</option>
-                </select>
-
-                <button type="button" onclick="signup()" class="btn btn-primary">Signup</button>
-            </form>
         </div>
 
         <!-- MAIN HORIZONTAL CONTENT -->
@@ -91,6 +68,6 @@
         </div>
     </div>
 
-    <script src="Citizen_page.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

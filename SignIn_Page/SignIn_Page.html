@@ -33,7 +33,7 @@
       margin-bottom: 2rem;
       color: #1e3c72;
     }
-    .signup-box input {
+    .signup-box input, .signup-box select {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
@@ -42,7 +42,7 @@
       font-size: 1rem;
       background-color: #ffffff;
     }
-    .signup-box input:focus {
+    .signup-box input:focus, .signup-box select:focus {
       border-color: #ff6600;
       box-shadow: 0 0 6px rgba(255,102,0,0.3);
       outline: none;
@@ -64,12 +64,6 @@
       background-color: #e65c00;
       transform: scale(1.03);
     }
-    .footer-text {
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-      color: #1e3c72;
-      font-weight: 500;
-    }
     .switch-link {
       margin-top: 1rem;
       font-size: 0.9rem;
@@ -85,11 +79,19 @@
   <div class="signup-box">
     <h2>📝 CivicFlow</h2>
     <p>Create Your Account</p>
-    <input type="text" id="name" placeholder="Enter Full Name">
-    <input type="email" id="email" placeholder="Enter Email">
-    <input type="password" id="password" placeholder="Enter Password">
+    <input type="text" id="name" placeholder="Enter Full Name" required>
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <input type="password" id="password" placeholder="Enter Password" required>
+    
+    <!-- Optional role selection -->
+    <select id="role">
+      <option value="citizen">Citizen</option>
+      <option value="officer">Officer</option>
+      <option value="admin">Admin</option>
+    </select>
+    
     <button onclick="signup()">Sign Up</button>
-    <div class="footer-text">Empowering Citizens, Enabling Governance</div>
+    <!-- Link back to Login -->
     <div class="switch-link">Already have an account? <a href="LogIn_page.html">Login</a></div>
   </div>
 
@@ -99,6 +101,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
   <script>
+    // Replace with your Firebase config
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -109,30 +112,33 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    function signup() {
+    async function signup() {
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
 
       if (!name || !email || !password) {
         alert("Please fill all fields.");
         return;
       }
 
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          db.collection("users").doc(user.uid).set({
-            name: name,
-            email: email,
-            role: "citizen"
-          });
-          alert("Signup successful! You can now login.");
-          window.location.href = "LogIn_page.html"; // redirect to login
-        })
-        .catch((error) => {
-          alert("Signup failed: " + error.message);
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Save user details in Firestore
+        await db.collection("users").doc(user.uid).set({
+          name: name,
+          email: email,
+          role: role
         });
+
+        alert("Signup successful! You can now login.");
+        window.location.href = "LogIn_page.html"; // redirect to login
+      } catch (error) {
+        alert("Signup failed: " + error.message);
+      }
     }
   </script>
 </body>

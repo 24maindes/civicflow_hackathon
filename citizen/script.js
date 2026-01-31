@@ -11,7 +11,6 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth(); // Added Firebase Auth
 
 // ---------- ELEMENTS ----------
 const submitChoice = document.getElementById("submitChoice");
@@ -27,12 +26,6 @@ const historyBox = document.getElementById("historyBox");
 const trackBtn = document.getElementById("trackBtn");
 const trackIdInput = document.getElementById("trackId");
 const trackResult = document.getElementById("trackResult");
-
-// Signup elements
-const signupForm = document.getElementById("signupForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const roleInput = document.getElementById("role");
 
 // ---------- INITIAL STATE ----------
 formContainer.style.display = "none";
@@ -75,37 +68,6 @@ trackChoice.addEventListener("click", () => {
     historyBox.style.display = "none";
 });
 
-// ---------- SIGNUP FUNCTION ----------
-window.signup = async function() {
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    const role = roleInput.value;
-
-    if(!email || !password || !role){
-        alert("Please fill all signup fields!");
-        return;
-    }
-
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-
-        // Save role in Firestore
-        await db.collection("users").doc(user.uid).set({
-            email: email,
-            role: role
-        });
-
-        alert("Signup successful!");
-        emailInput.value = "";
-        passwordInput.value = "";
-        roleInput.value = "";
-    } catch(error){
-        console.error(error);
-        alert("Signup failed: " + error.message);
-    }
-}
-
 // ---------- SUBMIT GRIEVANCE ----------
 form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -141,11 +103,26 @@ form.addEventListener("submit", (e) => {
     // Save updated history to LocalStorage
     localStorage.setItem("grievanceHistory", JSON.stringify(grievanceHistory));
 
-    // Add to Firebase
-    db.collection("grievances").add({
+    // --- BACKEND INTEGRATION (Silent) ---
+    // We get the current user and their role from the "users" collection 
+    // without stopping the UI flow.
+    const user = firebase.auth().currentUser;
+    const grievanceData = {
         ...grievanceObj,
-        createdAt: new Date()
-    });
+        createdAt: new Date(),
+        userId: user ? user.uid : "anonymous",
+        userEmail: user ? user.email : "anonymous"
+    };
+
+    if (user) {
+        db.collection("users").doc(user.uid).get().then(doc => {
+            const role = doc.exists ? doc.data().role : "Citizen";
+            db.collection("grievances").add({ ...grievanceData, role: role });
+        });
+    } else {
+        db.collection("grievances").add(grievanceData);
+    }
+    // ------------------------------------
 
     grievanceInfo.innerHTML = `
         <h3>✅ Grievance Submitted</h3>

@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #bde7f3; /* light background */
+      background-color: #bde7f3;
       height: 100vh;
       margin: 0;
       display: flex;
@@ -15,7 +15,7 @@
       align-items: center;
     }
     .login-box {
-      background-color: #e3f2fd; /* light blue box */
+      background-color: #e3f2fd;
       color: #1e3c72;
       padding: 3rem;
       border-radius: 16px;
@@ -26,7 +26,7 @@
     .login-box h2 {
       font-size: 2rem;
       margin-bottom: 0.5rem;
-      color: #ff6600; /* orange heading */
+      color: #ff6600;
     }
     .login-box p {
       font-size: 1rem;
@@ -53,7 +53,7 @@
       margin-top: 16px;
       border: none;
       border-radius: 8px;
-      background-color: #ff6600; /* orange button */
+      background-color: #ff6600;
       color: white;
       font-weight: 600;
       font-size: 1rem;
@@ -63,12 +63,6 @@
     .login-box button:hover {
       background-color: #e65c00;
       transform: scale(1.03);
-    }
-    .footer-text {
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-      color: #1e3c72;
-      font-weight: 500;
     }
     .switch-link {
       margin-top: 1rem;
@@ -83,13 +77,13 @@
 </head>
 <body>
   <div class="login-box">
-    <h2>🔒 CivicFlow</h2>
-    <p>Smart Citizen Grievance Routing System</p>
-    <input type="email" id="email" placeholder="Enter Email">
-    <input type="password" id="password" placeholder="Enter Password">
+    <h2>🔑 CivicFlow</h2>
+    <p>Login to Your Account</p>
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <input type="password" id="password" placeholder="Enter Password" required>
     <button onclick="login()">Login</button>
-    <div class="footer-text">Empowering Citizens, Enabling Governance</div>
-    <div class="switch-link">Don’t have an account? <a href="SigIn_Page.html">Sign Up</a></div>
+    <!-- Link to Sign Up -->
+    <div class="switch-link">Don’t have an account? <a href="SignUp_page.html">Sign Up</a></div>
   </div>
 
   <!-- Firebase SDK -->
@@ -98,7 +92,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
   <script>
-    // Replace with your Firebase config
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -109,38 +102,27 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    function login() {
+    async function login() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      if (!email || !password) {
-        alert("Please enter both email and password.");
-        return;
-      }
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
 
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          db.collection("users").doc(user.uid).get().then((doc) => {
-            if (doc.exists) {
-              const role = doc.data().role;
-              if (role === "citizen") {
-                window.location.href = "citizen_dashboard.html";
-              } else if (role === "officer") {
-                window.location.href = "officer_dashboard.html";
-              } else if (role === "admin") {
-                window.location.href = "admin_dashboard.html";
-              } else {
-                alert("Unknown role. Please contact support.");
-              }
-            } else {
-              alert("No role assigned. Please contact support.");
-            }
-          });
-        })
-        .catch((error) => {
-          alert("Login failed: " + error.message);
-        });
+        const docRef = db.collection("users").doc(user.uid);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+          const userData = docSnap.data();
+          alert(`Login successful! Welcome ${userData.name || "User"} (${userData.role})`);
+          window.location.href = "PersonalDetails_page.html";
+        } else {
+          alert("Login successful, but no user data found in Firestore.");
+        }
+      } catch (error) {
+        alert("Login failed: " + error.message);
+      }
     }
   </script>
 </body>
