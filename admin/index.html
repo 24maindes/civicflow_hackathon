@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="page-title">
+        <span class="title-main">Admin Dashboard</span>
+        <span class="title-sub">Centralized Grievance Management</span>
+    </div>
+
+    <div class="main-container">
+        <div class="dashboard-container">
+
+            <!-- Header -->
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <img src="admin_image.jpg" alt="Admin Avatar" height="60" width="60">
+            </div>
+
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-card">
+                    <p>Total Grievances</p>
+                    <h3 id="totalGrievances">0</h3>
+                </div>
+
+                <div class="stat-card">
+                    <p>Open Grievances</p>
+                    <h3 id="openGrievances">0</h3>
+                </div>
+
+                <div class="stat-card">
+                    <p>SLA Breaches</p>
+                    <h3 id="slaBreaches" class="danger">0</h3>
+                </div>
+
+                <div class="stat-card">
+                    <p>Today's Escalations</p>
+                    <h3 id="escalations">0</h3>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <h3 class="section-title">Manage Department Mapping</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Location</th>
+                        <th>Department</th>
+                        <th>Address</th> <!-- ✅ NEW COLUMN -->
+                        <th>SLA (Days)</th>
+                    </tr>
+                </thead>
+                <tbody id="mappingTableBody">
+                    <!-- rows inserted by JS -->
+                </tbody>
+            </table>
+
+            <button class="add-btn" onclick="addMapping()">
+                Add New Mapping
+            </button>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
