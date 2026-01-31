@@ -1,74 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-    <div class="page-title">
-        <span class="title-main">Admin Dashboard</span>
-        <span class="title-sub">Centralized Grievance Management</span>
+<div class="page-title">
+  <span class="title-main">Admin Dashboard</span>
+  <span class="title-sub">Centralized Grievance Management</span>
+</div>
+
+<div class="main-container">
+  <div class="dashboard-container">
+
+    <div class="dashboard-header">
+      <h2>Admin Dashboard</h2>
+      <img src="admin_image.jpg" height="60" width="60">
     </div>
 
-    <div class="main-container">
-        <div class="dashboard-container">
+    <h3 class="section-title">Manage Department Mapping</h3>
 
-            <!-- Header -->
-            <div class="dashboard-header">
-                <h2>Admin Dashboard</h2>
-                <img src="admin_image.jpg" alt="Admin Avatar" height="60" width="60">
-            </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Department</th>
+        </tr>
+      </thead>
+      <tbody id="mappingTableBody"></tbody>
+    </table>
 
-            <!-- Stats -->
-            <div class="stats">
-                <div class="stat-card">
-                    <p>Total Grievances</p>
-                    <h3 id="totalGrievances">0</h3>
-                </div>
+    <button class="add-btn" id="openModalBtn">Add New Mapping</button>
+  </div>
+</div>
 
-                <div class="stat-card">
-                    <p>Open Grievances</p>
-                    <h3 id="openGrievances">0</h3>
-                </div>
+<!-- MODAL -->
+<div class="modal" id="mappingModal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeModalBtn">&times;</span>
 
-                <div class="stat-card">
-                    <p>SLA Breaches</p>
-                    <h3 id="slaBreaches" class="danger">0</h3>
-                </div>
+    <h3 class="modal-title">Add Department Mapping</h3>
 
-                <div class="stat-card">
-                    <p>Today's Escalations</p>
-                    <h3 id="escalations">0</h3>
-                </div>
-            </div>
+    <form id="mappingForm" class="mapping-form">
+      <label>Category</label>
+      <input type="text" id="category" required placeholder="e.g. Road">
 
-            <!-- Table -->
-            <h3 class="section-title">Manage Department Mapping</h3>
+      <label>Department</label>
+      <input type="text" id="department" required placeholder="e.g. PWD">
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Location</th>
-                        <th>Department</th>
-                        <th>Address</th> <!-- ✅ NEW COLUMN -->
-                        <th>SLA (Days)</th>
-                    </tr>
-                </thead>
-                <tbody id="mappingTableBody">
-                    <!-- rows inserted by JS -->
-                </tbody>
-            </table>
+      <button type="submit" class="save-btn">Save Mapping</button>
+    </form>
+  </div>
+</div>
 
-            <button class="add-btn" onclick="addMapping()">
-                Add New Mapping
-            </button>
-
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
