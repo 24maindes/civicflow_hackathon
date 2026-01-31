@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citizen Grievance Portal</title>
-    <link rel="stylesheet" href="Citizen_page.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="container">
@@ -12,10 +16,9 @@
         <p>Report Public Issues Easily.</p>
 
         <div class="choice-box">
-    <button id="submitChoice" class="btn btn-primary">Submit Grievance</button>
-    <button id="trackChoice" class="btn btn-track">Track Grievance</button>
+            <button id="submitChoice" class="btn btn-primary">Submit Grievance</button>
+            <button id="trackChoice" class="btn btn-track">Track Grievance</button>
         </div>
-
 
         <!-- MAIN HORIZONTAL CONTENT -->
         <div class="main-content">
@@ -39,9 +42,9 @@
 
                     <label for="pincode">Pincode:</label>
                     <input type="text" id="pincode" placeholder="Enter Pincode" required>
+
                     <label for="area">Area / Locality:</label>
                     <input type="text" id="area" placeholder="Enter Area or Locality" required>
-
 
                     <label for="description">Description:</label>
                     <textarea id="description" placeholder="Describe your issue..." required></textarea>
@@ -51,7 +54,6 @@
 
                 <div id="grievanceInfo" class="grievance-info"></div>
                 <div id="historyBox" class="grievance-info"></div>
-
             </div>
 
             <!-- Track Grievance Section -->
@@ -66,6 +68,6 @@
         </div>
     </div>
 
-    <script src="Citizen_page.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

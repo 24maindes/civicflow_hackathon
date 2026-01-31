@@ -1,3 +1,17 @@
+// ---------- FIREBASE CONFIG ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyB72IUqfi0iBLZfkMYlYejToOaL13wB2wc",
+  authDomain: "civicflow-17d38.firebaseapp.com",
+  projectId: "civicflow-17d38",
+  storageBucket: "civicflow-17d38.firebasestorage.app",
+  messagingSenderId: "1040325288838",
+  appId: "1:1040325288838:web:6bf24f9147a62beee38207"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 // ---------- ELEMENTS ----------
 const submitChoice = document.getElementById("submitChoice");
 const trackChoice = document.getElementById("trackChoice");
@@ -19,15 +33,11 @@ trackContainer.style.display = "none";
 historyBox.style.display = "none";
 
 // ---------- DATA ----------
-// Load previous complaints from localStorage
 const storedHistory = localStorage.getItem("grievanceHistory");
 const grievanceHistory = storedHistory ? JSON.parse(storedHistory) : [];
 
-// Map for quick lookup by ID
 const submittedGrievances = {};
-grievanceHistory.forEach(g => {
-    submittedGrievances[g.id] = g;
-});
+grievanceHistory.forEach(g => submittedGrievances[g.id] = g);
 
 let grievanceCounter = grievanceHistory.length > 0 
     ? parseInt(grievanceHistory[grievanceHistory.length - 1].id.replace("GRV", "")) 
@@ -49,8 +59,7 @@ submitChoice.addEventListener("click", () => {
     formContainer.style.display = "block";
     trackContainer.style.display = "none";
     historyBox.style.display = "block";
-
-    showHistory(); // show all previous complaints immediately
+    showHistory();
 });
 
 trackChoice.addEventListener("click", () => {
@@ -94,6 +103,27 @@ form.addEventListener("submit", (e) => {
     // Save updated history to LocalStorage
     localStorage.setItem("grievanceHistory", JSON.stringify(grievanceHistory));
 
+    // --- BACKEND INTEGRATION (Silent) ---
+    // We get the current user and their role from the "users" collection 
+    // without stopping the UI flow.
+    const user = firebase.auth().currentUser;
+    const grievanceData = {
+        ...grievanceObj,
+        createdAt: new Date(),
+        userId: user ? user.uid : "anonymous",
+        userEmail: user ? user.email : "anonymous"
+    };
+
+    if (user) {
+        db.collection("users").doc(user.uid).get().then(doc => {
+            const role = doc.exists ? doc.data().role : "Citizen";
+            db.collection("grievances").add({ ...grievanceData, role: role });
+        });
+    } else {
+        db.collection("grievances").add(grievanceData);
+    }
+    // ------------------------------------
+
     grievanceInfo.innerHTML = `
         <h3>✅ Grievance Submitted</h3>
         <p><b>Grievance ID:</b> ${grievanceID}</p>
@@ -103,7 +133,7 @@ form.addEventListener("submit", (e) => {
         <p><b>SLA:</b> ${dept.sla} days</p>
     `;
 
-    showHistory(); // refresh history after submission
+    showHistory();
     form.reset();
 });
 
