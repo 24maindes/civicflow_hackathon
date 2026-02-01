@@ -1,120 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>CivicFlow - Personal Details</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #bde7f3; /* light background */
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .details-box {
-      background-color: #e3f2fd; /* light blue box */
-      color: #1e3c72;
-      padding: 3rem;
-      border-radius: 16px;
-      width: 480px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .details-box h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      color: #ff6600; /* orange heading */
-    }
-    .details-box input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-      background-color: #ffffff;
-    }
-    .details-box input:focus {
-      border-color: #ff6600;
-      box-shadow: 0 0 6px rgba(255,102,0,0.3);
-      outline: none;
-    }
-    .details-box button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 16px;
-      border: none;
-      border-radius: 8px;
-      background-color: #ff6600;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .details-box button:hover {
-      background-color: #e65c00;
-      transform: scale(1.03);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>CivicFlow - Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #bde7f3; height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .details-box { background: #e3f2fd; padding: 2.5rem; border-radius: 16px; width: 450px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); text-align: center; }
+        h2 { color: #ff6600; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 8px; background: #ff6600; color: white; font-weight: 600; cursor: pointer; }
+    </style>
 </head>
 <body>
-  <div class="details-box">
-    <h2>👤 Personal Details</h2>
-    <form id="detailsForm" onsubmit="submitDetails(event)">
-      <input type="text" id="name" placeholder="Full Name" required>
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="tel" id="phone" placeholder="Phone Number" required pattern="[0-9]{10}">
-      <input type="text" id="location" placeholder="Location" required>
-      <button type="submit">Submit</button>
-    </form>
-  </div>
+    <div class="details-box">
+        <h2>👤 Complete Profile</h2>
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="tel" id="phone" placeholder="Phone Number" required pattern="[0-9]{10}">
+        <input type="text" id="location" placeholder="City/Location" required>
+        <input type="email" id="email" placeholder="Email Address" required>
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="submitDetails()">Go to Dashboard</button>
+    </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-  <script>
-    // Replace with your Firebase config
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-    };
+        const firebaseConfig = { /* SAME CONFIG AS ABOVE */ };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+        window.submitDetails = async () => {
+            const user = auth.currentUser;
+            if (!user) return alert("Please sign up first");
 
-    function submitDetails(event) {
-      event.preventDefault(); // prevent page reload
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const location = document.getElementById("location").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
 
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const phone = document.getElementById("phone").value;
-      const location = document.getElementById("location").value;
+            try {
+                // Update email if changed
+                if (email && email !== user.email) {
+                    await updateEmail(user, email);
+                }
 
-      const user = auth.currentUser;
-      if (user) {
-        db.collection("users").doc(user.uid).update({
-          name: name,
-          email: email,
-          phone: phone,
-          location: location
-        }).then(() => {
-          alert("Details submitted successfully!");
-        }).catch((error) => {
-          alert("Error submitting details: " + error.message);
-        });
-      } else {
-        alert("You must be logged in to submit details.");
-        window.location.href = "LogIn_page.html";
-      }
-    }
-  </script>
+                // Update password if provided
+                
+
+                // Save profile details in Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    name,
+                    phone,
+                    location,
+                    email
+                }, { merge: true });
+
+                alert("Profile updated successfully!");
+                window.location.href = "Citizen_dashboard.html";
+
+            } catch (err) {
+                if (err.code === "auth/requires-recent-login") {
+                    alert("Please sign in again before changing email or password.");
+                    window.location.href = "SignIn_page.html";
+                } else {
+                    alert("Error: " + err.message);
+                }
+            }
+        };
+    </script>
 </body>
 </html>
