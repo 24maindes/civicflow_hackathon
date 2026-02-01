@@ -107,23 +107,35 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 
 const tableBody = document.getElementById("complaintsTable");
 
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-        return;
+async function loadDashboard(user) {
+    const userDocRef = doc(db, "users", user.uid);
+
+    // ✅ Wait until the Firestore user document exists (max 5 attempts)
+    let userDoc;
+    let attempts = 0;
+    while (attempts < 5) {
+        userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) break;
+        await new Promise(r => setTimeout(r, 500)); // wait 0.5s
+        attempts++;
     }
 
-    const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists() || userDoc.data().role !== "officer") {
-        alert("Unauthorized access!");
+        alert("Unauthorized access or user data not ready yet!");
         window.location.href = "../SignIn_Page/index.html";
         return;
+
     }
+    if (!user) {
+    if (!window.location.pathname.includes("SignIn_Page")) {
+      window.location.href = "../SignIn_Page/index.html";
+    }
+  }
+};
 
     const officerDept = userDoc.data().department || "General Dept";
     const q = query(collection(db, "complaints"), where("department", "==", officerDept));
 
-    // Real-time updates
     onSnapshot(q, (snapshot) => {
         tableBody.innerHTML = "";
         snapshot.forEach((docSnap) => {
@@ -145,14 +157,26 @@ onAuthStateChanged(auth, async (user) => {
             `;
         });
     });
+
+
+// ✅ Trigger dashboard after auth state is ready
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "../SignIn_Page/index.html";
+        return;
+    }
+    loadDashboard(user);
 });
 
+// Bottom buttons
 window.goToUpdate = (id) => { window.location.href = `officerUpdate.html?id=${id}`; };
 window.goBack = () => { window.history.back(); };
 window.logoutUser = async () => {
     await signOut(auth);
-    window.location.href = "login.html";
+    window.location.href = "../SignIn_Page/index.html";
 };
 </script>
+
+
 </body>
 </html>
