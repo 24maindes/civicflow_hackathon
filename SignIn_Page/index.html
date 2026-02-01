@@ -76,11 +76,19 @@
     <option value="officer">Officer</option>
   </select>
 
-  <button id="signupBtn">Sign Up</button>
+<button onclick="SignUp()">SignUp</button>
+
+<script>
+  function SignUp() {
+    // Redirect to your Citizen page folder
+    window.location.href = "../Personal_detailes/index.html";  
+    // 👆 Adjust the path depending on your folder structure
+  }
+</script>
 
   <p>Already have an account?
-    <a href="Login_page.html">Login</a>
-  </p>
+  <a href="../LogIn_Page/index.html">Log In</a>
+</p>
 </div>
 
 <!-- ✅ SIGNUP SCRIPT -->
