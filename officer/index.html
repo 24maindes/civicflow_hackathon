@@ -1,99 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Officer Dashboard</title>
-
-    <!-- Firebase SDKs (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-    <style>
-        body { font-family: Arial; background: linear-gradient(to right, #e8f5e9, #f1f8ff); margin:0; }
-        .container { max-width:1100px; margin:40px auto; background:white; padding:30px; border-radius:12px; box-shadow:0 6px 12px rgba(0,0,0,0.1);}
-        .header { background:#1b5e20; color:white; padding:20px; font-size:22px; text-align:center; border-radius:8px 8px 0 0; font-weight:bold;}
-        h3 { color:#1b5e20; text-align:center; margin-bottom:20px; }
-        table { width:100%; border-collapse: collapse; margin:0 auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.08);}
-        th { background:#e3f2fd; color:#0d47a1; }
-        th, td { padding:15px; text-align:left; }
-        tr:nth-child(even) { background:#f9f9f9; }
-        tr:hover { background:#f1f8e9; }
-        .status { padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; color:white; }
-        .pending { background:#ff9800; } .progress { background:#4caf50; } .resolved { background:#2196f3; }
-        button { padding:8px 14px; background:#1976d2; color:white; border:none; border-radius:6px; cursor:pointer; }
-        button:hover { background:#0d47a1; }
-    </style>
+<meta charset="UTF-8">
+<title>Officer Dashboard</title>
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #e8f5e9, #f1f8ff);
+    margin: 0;
+    padding: 30px;
+}
+.container {
+    max-width: 1100px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+.header {
+    background: #1b5e20;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+th {
+    background: #e3f2fd;
+    color: #0d47a1;
+}
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+.assigned { background: orange; }
+.progress { background: green; }
+.done { background: blue; }
+.bottom-buttons {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+}
+.bottom-buttons button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+}
+.back-btn { background: #6c757d; }
+.logout-btn { background: #d32f2f; }
+.back-btn:hover { background: #5a6268; }
+.logout-btn:hover { background: #9a0007; }
+button.update-btn {
+    padding: 6px 12px;
+    background: #1976d2;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}
+button.update-btn:hover { background: #0d47a1; }
+</style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">Officer Dashboard</div>
-    <h3>Assigned Grievances</h3>
+    <div class="header"><h2>Officer Dashboard</h2></div>
+
     <table>
         <thead>
-            <tr><th>ID</th><th>Category</th><th>Area</th><th>Status</th><th>Action</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>Category</th>
+                <th>Area</th>
+                <th>Status</th>
+                <th>Update</th>
+            </tr>
         </thead>
-        <tbody id="grievanceTable"></tbody>
+        <tbody id="complaintsTable"></tbody>
     </table>
+
+    <div class="bottom-buttons">
+        <button class="back-btn" onclick="goBack()">Back</button>
+        <button class="logout-btn" onclick="logoutUser()">Logout</button>
+    </div>
 </div>
 
-<script>
-    // Firebase Config
-    const firebaseConfig = {
-        apiKey: "AIzaSyB72IUqfi0iBLZfkMYlYejToOaL13wB2wc",
-        authDomain: "civicflow-17d38.firebaseapp.com",
-        projectId: "civicflow-17d38",
-        storageBucket: "civicflow-17d38.firebasestorage.app",
-        messagingSenderId: "1040325288838",
-        appId: "1:1040325288838:web:6bf24f9147a62beee38207"
-    };
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { collection, query, where, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+const tableBody = document.getElementById("complaintsTable");
 
-    const tableBody = document.getElementById("grievanceTable");
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
 
-    // Load grievances
-    db.collection("grievances")
-      .where("department", "==", "Electricity Dept")
-      .onSnapshot(snapshot => {
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (!userDoc.exists() || userDoc.data().role !== "officer") {
+        alert("Unauthorized access!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const officerDept = userDoc.data().department || "General Dept";
+    const q = query(collection(db, "complaints"), where("department", "==", officerDept));
+
+    // Real-time updates
+    onSnapshot(q, (snapshot) => {
         tableBody.innerHTML = "";
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            let statusClass = data.status === "In Progress" ? "progress" : data.status === "Resolved" ? "resolved" : "pending";
+        snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            const id = docSnap.id;
+
+            let statusClass =
+                data.status === "In Progress" ? "progress" :
+                data.status === "Done" ? "done" : "assigned";
+
             tableBody.innerHTML += `
                 <tr>
-                    <td>${doc.id}</td>
+                    <td>${id}</td>
                     <td>${data.category}</td>
                     <td>${data.area}</td>
                     <td><span class="status ${statusClass}">${data.status}</span></td>
-                    <td>
-                        <button onclick="goToUpdate('${doc.id}')">Update</button>
-                    </td>
+                    <td><button class="update-btn" onclick="goToUpdate('${id}')">Update</button></td>
                 </tr>
             `;
         });
     });
+});
 
-    function goToUpdate(id) {
-        // Pass grievance ID to update page
-        window.location.href = `update.html?id=${id}`;
-    }
-
-    // Backend-only signup
-    window.signup = async function(email, password, role) {
-        try {
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            await db.collection("users").doc(user.uid).set({ email, role });
-            console.log("Signup successful for:", email);
-        } catch (err) {
-            console.error("Error in signup:", err.message);
-        }
-    };
+window.goToUpdate = (id) => { window.location.href = `officerUpdate.html?id=${id}`; };
+window.goBack = () => { window.history.back(); };
+window.logoutUser = async () => {
+    await signOut(auth);
+    window.location.href = "login.html";
+};
 </script>
-
 </body>
 </html>
-

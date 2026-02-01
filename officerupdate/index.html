@@ -2,26 +2,117 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Update Grievance</title>
+<title>Officer Update Grievance</title>
+<style>
+body {
+    font-family: Arial;
+    background: #f1f8ff;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.update-box {
+    width: 600px;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.header {
+    background: #1b5e20;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    font-size: 22px;
+}
+
+label {
+    font-weight: bold;
+}
+
+select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    flex: 1;
+    padding: 12px 18px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.back-btn { background: #6c757d; }
+.back-btn:hover { background: #5a6268; }
+
+.submit-btn { background: #1976d2; }
+.submit-btn:hover { background: #0d47a1; }
+
+.logout-btn { background: #d32f2f; }
+.logout-btn:hover { background: #9a0007; }
+</style>
+</head>
+<body>
+
+<div class="update-box">
+    <div class="header">Update Grievance Status</div>
+
+    <h3 id="grievanceId">Grievance ID:</h3>
+
+    <label>Status:</label>
+    <select id="status">
+        <option value="">Select status</option>
+        <option value="Assigned">Assigned</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+    </select>
+
+    <label>Remarks:</label>
+    <textarea id="remarks" rows="5" placeholder="Enter remarks..."></textarea>
+
+    <div class="button-group">
+        <button class="back-btn" onclick="goBack()">Back</button>
+        <button id="submitBtn" class="submit-btn" onclick="submitUpdate()">Submit</button>
+        <button class="logout-btn" onclick="logoutUser()">Logout</button>
+    </div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+/* Firebase config */
 const firebaseConfig = {
-    apiKey: "AIzaSyB72IUqfi0iBLZfkMYlYejToOaL13wB2wc",
-    authDomain: "civicflow-17d38.firebaseapp.com",
-    projectId: "civicflow-17d38",
-    storageBucket: "civicflow-17d38.firebasestorage.app",
-    messagingSenderId: "1040325288838",
-    appId: "1:1040325288838:web:6bf24f9147a62beee38207"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* Get grievance ID from URL */
 const params = new URLSearchParams(window.location.search);
 const grievanceId = params.get("id");
 
@@ -30,44 +121,61 @@ const statusInput = document.getElementById("status");
 const remarksInput = document.getElementById("remarks");
 const submitBtn = document.getElementById("submitBtn");
 
-if (!grievanceId) {
-    alert("No grievance selected!");
-    window.location.href = "officer.html";
-} else {
-    grievanceTitle.innerText = "Grievance ID: " + grievanceId;
-
-    // Prefill existing grievance
-    const grievanceDoc = await getDoc(doc(db, "grievances", grievanceId));
-    if (grievanceDoc.exists()) {
-        const data = grievanceDoc.data();
-        statusInput.value = data.status || "";
-        remarksInput.value = data.remarks || "";
-    }
-}
-
-onAuthStateChanged(auth, user => {
+/* Auth + grievance check */
+onAuthStateChanged(auth, async (user) => {
     if (!user) {
         alert("Please login first");
         window.location.href = "login.html";
+        return;
+    }
+
+    if (!grievanceId) {
+        alert("No grievance selected!");
+        window.location.href = "officer.html";
+        return;
+    }
+
+    grievanceTitle.innerText = "Grievance ID: " + grievanceId;
+
+    try {
+        const grievanceDoc = await getDoc(doc(db, "complaints", grievanceId));
+        if (grievanceDoc.exists()) {
+            const data = grievanceDoc.data();
+            statusInput.value = data.status || "";
+            remarksInput.value = data.remarks || "";
+        } else {
+            alert("Grievance not found!");
+            window.location.href = "officer.html";
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error fetching grievance data.");
     }
 });
 
-async function submitUpdate() {
+/* Submit update */
+window.submitUpdate = async function() {
     const newStatus = statusInput.value;
     const remarks = remarksInput.value.trim();
-    if (!newStatus) { alert("Select status"); return; }
+
+    if (!newStatus) {
+        alert("Please select a status.");
+        return;
+    }
 
     submitBtn.disabled = true;
 
     try {
-        await updateDoc(doc(db, "grievances", grievanceId), {
+        await updateDoc(doc(db, "complaints", grievanceId), {
             status: newStatus,
             remarks: remarks,
             updatedAt: serverTimestamp(),
             updatedBy: auth.currentUser.uid
         });
-        alert("Grievance updated!");
+
+        alert("Grievance updated successfully!");
         window.location.href = "officer.html";
+
     } catch (err) {
         console.error(err);
         alert("Error updating grievance: " + err.message);
@@ -75,33 +183,24 @@ async function submitUpdate() {
         submitBtn.disabled = false;
     }
 }
+
+/* Back */
+window.goBack = function() {
+    window.location.href = "officer.html";
+}
+
+/* Logout */
+window.logoutUser = async function() {
+    try {
+        await signOut(auth);
+        alert("Logged out successfully!");
+        window.location.href = "login.html";
+    } catch (err) {
+        alert("Logout failed: " + err.message);
+    }
+}
 </script>
-
-<style>
-body { font-family: Arial; background:#f1f8ff; padding:30px; display:flex; justify-content:center; }
-.update-box { width:600px; background:white; padding:40px; border-radius:15px; box-shadow:0 10px 20px rgba(0,0,0,0.15);}
-.header { background:#1b5e20; color:white; text-align:center; padding:20px; border-radius:10px; margin-bottom:30px; font-size:22px;}
-select, textarea { width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid #ccc;}
-button { padding:12px 18px; background:#1976d2; color:white; border:none; border-radius:8px; cursor:pointer;}
-button:hover { background:#0d47a1; }
-</style>
-</head>
-<body>
-
-<div class="update-box">
-    <div class="header">Update Grievance Status</div>
-    <h3 id="grievanceId">Grievance ID:</h3>
-    <label>Status:</label>
-    <select id="status">
-        <option value="">Select status</option>
-        <option value="Pending">Pending</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Resolved">Resolved</option>
-    </select>
-    <label>Remarks:</label>
-    <textarea id="remarks" rows="5" placeholder="Enter remarks..."></textarea>
-    <button id="submitBtn" onclick="submitUpdate()">Submit</button>
-</div>
 
 </body>
 </html>
+
