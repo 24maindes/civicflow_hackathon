@@ -108,22 +108,26 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 const tableBody = document.getElementById("complaintsTable");
 
 onAuthStateChanged(auth, async (user) => {
+    // If user is not logged in
     if (!user) {
-        window.location.href = "login.html";
+        // Only redirect if not already on SignIn page
+        if (!window.location.pathname.includes("SignIn_Page")) {
+            window.location.href = "../SignIn_Page/index.html";
+        }
         return;
     }
 
+    // Fetch user role
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists() || userDoc.data().role !== "officer") {
         alert("Unauthorized access!");
-        window.location.href = "login.html";
+        window.location.href = "../LogIn_Page/index.html";
         return;
     }
 
     const officerDept = userDoc.data().department || "General Dept";
     const q = query(collection(db, "complaints"), where("department", "==", officerDept));
 
-    // Real-time updates
     onSnapshot(q, (snapshot) => {
         tableBody.innerHTML = "";
         snapshot.forEach((docSnap) => {
@@ -146,6 +150,7 @@ onAuthStateChanged(auth, async (user) => {
         });
     });
 });
+
 
 window.goToUpdate = (id) => { window.location.href = `officerUpdate.html?id=${id}`; };
 window.goBack = () => { window.history.back(); };
