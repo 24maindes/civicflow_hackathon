@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CivicFlow - Admin Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #bde7f3;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .details-box {
+      background-color: #e3f2fd;
+      color: #1e3c72;
+      padding: 2.5rem;
+      border-radius: 16px;
+      width: 480px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .details-box h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: #ff6600;
+    }
+    .label {
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 10px;
+      color: #555;
+      display: block;
+    }
+    .details-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 5px 0 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .details-box button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ff6600;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .details-box button:hover {
+      background-color: #e65c00;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+  <div class="details-box">
+    <h2>🛡️ Admin Profile</h2>
+    <form id="adminForm" onsubmit="submitAdminDetails(event)">
+      
+      <span class="label">ADMIN ID</span>
+      <input type="text" id="adminId" placeholder="Enter Admin ID" required>
+
+      <span class="label">FULL NAME</span>
+      <input type="text" id="name" placeholder="Enter Full Name" required>
+
+      <span class="label">ROLE / POSITION</span>
+      <input type="text" id="role" placeholder="Enter Role or Position" required>
+
+      <span class="label">DEPARTMENT / DIVISION</span>
+      <input type="text" id="department" placeholder="Enter Department or Division" required>
+
+      <span class="label">CONTACT NUMBER</span>
+      <input type="tel" id="phone" placeholder="10-digit mobile number" required pattern="[0-9]{10}">
+
+      <span class="label">OFFICE LOCATION</span>
+      <input type="text" id="location" placeholder="City / Office Location" required>
+
+      <button type="submit">Complete & Go to Admin Dashboard</button>
+    </form>
+  </div>
+
+  <script>
+    function submitAdminDetails(event) {
+      event.preventDefault();
+      const adminId = document.getElementById("adminId").value;
+      const name = document.getElementById("name").value;
+      const role = document.getElementById("role").value;
+      const department = document.getElementById("department").value;
+      const phone = document.getElementById("phone").value;
+      const location = document.getElementById("location").value;
+
+      // For now, just show an alert. Replace with Firebase logic if needed.
+      alert("Admin details submitted:\n" +
+            "ID: " + adminId + "\n" +
+            "Name: " + name + "\n" +
+            "Role: " + role + "\n" +
+            "Department: " + department + "\n" +
+            "Phone: " + phone + "\n" +
+            "Location: " + location);
+
+      // Redirect to Admin Dashboard
+      window.location.href = "../admin/index.html";
+    }
+  </script>
+</body>
+</html>
