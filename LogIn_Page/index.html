@@ -13,59 +13,68 @@
     button:hover { background: #e65c00; }
   </style>
 </head>
+
 <body>
 <div class="box">
   <h2>🔑 CivicFlow</h2>
   <p>Login</p>
+
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
+
   <button onclick="login()">Login</button>
+
   <p>Don’t have an account? <a href="SignIn_page.html">Sign Up</a></p>
 </div>
 
+<!-- ✅ UPDATED SCRIPT -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+  // 🔹 Import auth & db from centralized firebase.js
+  import { auth, db } from "../firebase.js"; // adjust path if needed
 
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-  };
+  // 🔹 Import required Firebase functions
+  import { signInWithEmailAndPassword } from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  import { doc, getDoc } from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   window.login = async () => {
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
 
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
-      
-      // 🕵️ Fetch user role from Firestore
-      const snap = await getDoc(doc(db, "users", userCred.user.uid));
 
-      if (snap.exists()) {
-        const userData = snap.data();
-        const role = userData.role;
+      // 🔍 Fetch user role from Firestore
+      const userRef = doc(db, "users", userCred.user.uid);
+      const snap = await getDoc(userRef);
 
-        alert("Welcome " + userData.name);
-
-        // 🚀 SWITCHBOARD: Send user to the right page
-        if (role === "admin") {
-          window.location.href = "Admin_dashboard.html";
-        } else if (role === "officer") {
-          window.location.href = "Officer_dashboard.html";
-        } else {
-          window.location.href = "Citizen_dashboard.html";
-        }
-      } else {
-        alert("User profile not found in database.");
+      if (!snap.exists()) {
+        alert("User profile not found. Contact admin.");
+        return;
       }
-    } catch (err) { alert(err.message); }
+
+      const userData = snap.data();
+      alert("Welcome " + userData.name);
+
+      // 🚀 Role-based routing
+      if (userData.role === "admin") {
+        window.location.href = "../Admin_Dashboard/index.html";
+      } else if (userData.role === "officer") {
+        window.location.href = "../Officer_Dashboard/index.html";
+      } else {
+        window.location.href = "../Citizen_Dashboard/index.html";
+      }
+
+    } catch (err) {
+      alert(err.message);
+    }
   };
 </script>
 </body>
