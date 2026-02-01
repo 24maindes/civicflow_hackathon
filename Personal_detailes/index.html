@@ -5,73 +5,106 @@
     <title>CivicFlow - Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #bde7f3; height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
-        .details-box { background: #e3f2fd; padding: 2.5rem; border-radius: 16px; width: 450px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); text-align: center; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #bde7f3;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .details-box {
+            background: #e3f2fd;
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 450px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            text-align: center;
+        }
         h2 { color: #ff6600; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 8px; background: #ff6600; color: white; font-weight: 600; cursor: pointer; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #ff6600;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
-    <div class="details-box">
-        <h2>👤 Complete Profile</h2>
-        <input type="text" id="name" placeholder="Full Name" required>
-        <input type="tel" id="phone" placeholder="Phone Number" required pattern="[0-9]{10}">
-        <input type="text" id="location" placeholder="City/Location" required>
-        <input type="email" id="email" placeholder="Email Address" required>
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="submitDetails()">Go to Dashboard</button>
-    </div>
+<div class="details-box">
+    <h2>👤 Complete Profile</h2>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="tel" id="phone" placeholder="Phone Number" pattern="[0-9]{10}" required>
+    <input type="text" id="location" placeholder="City/Location" required>
+    <input type="email" id="email" placeholder="Email Address" required>
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="submitDetails()">Go to Dashboard</button>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+<script type="module">
+    import { auth, db } from "./firebase.js";
+    import { updateEmail, updatePassword } from
+        "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { doc, setDoc } from
+        "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { /* SAME CONFIG AS ABOVE */ };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    window.submitDetails = async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("Please sign up first");
+            window.location.href = "SignIn_page.html";
+            return;
+        }
 
-        window.submitDetails = async () => {
-            const user = auth.currentUser;
-            if (!user) return alert("Please sign up first");
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        const location = document.getElementById("location").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-            const name = document.getElementById("name").value;
-            const phone = document.getElementById("phone").value;
-            const location = document.getElementById("location").value;
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-
-            try {
-                // Update email if changed
-                if (email && email !== user.email) {
-                    await updateEmail(user, email);
-                }
-
-                // Update password if provided
-                
-
-                // Save profile details in Firestore
-                await setDoc(doc(db, "users", user.uid), {
-                    name,
-                    phone,
-                    location,
-                    email
-                }, { merge: true });
-
-                alert("Profile updated successfully!");
-                window.location.href = "Citizen_dashboard.html";
-
-            } catch (err) {
-                if (err.code === "auth/requires-recent-login") {
-                    alert("Please sign in again before changing email or password.");
-                    window.location.href = "SignIn_page.html";
-                } else {
-                    alert("Error: " + err.message);
-                }
+        try {
+            if (email && email !== user.email) {
+                await updateEmail(user, email);
             }
-        };
-    </script>
+
+            if (password) {
+                await updatePassword(user, password);
+            }
+
+            await setDoc(doc(db, "users", user.uid), {
+                name,
+                phone,
+                location,
+                email
+            }, { merge: true });
+
+            alert("Profile updated successfully!");
+            window.location.href = "Citizen_dashboard.html";
+
+        } catch (err) {
+            if (err.code === "auth/requires-recent-login") {
+                alert("Please sign in again before changing email or password.");
+                window.location.href = "SignIn_page.html";
+            } else {
+                alert(err.message);
+            }
+        }
+    };
+</script>
 </body>
 </html>

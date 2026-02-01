@@ -3,63 +3,154 @@
 <head>
   <meta charset="UTF-8">
   <title>CivicFlow Sign Up</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: 'Poppins', sans-serif; background: #bde7f3; height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
-    .box { background: #e3f2fd; padding: 3rem; border-radius: 16px; width: 420px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-    h2 { color: #ff6600; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; background: #ff6600; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    button:hover { background: #e65c00; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #bde7f3;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      background: #e3f2fd;
+      padding: 3rem;
+      border-radius: 16px;
+      width: 420px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #ff6600;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #ff6600;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #e65c00;
+    }
   </style>
 </head>
+
 <body>
+
 <div class="box">
   <h2>📝 CivicFlow</h2>
   <p>Create Account</p>
+
   <input type="text" id="name" placeholder="Full Name">
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
-  <button onclick="signup()">Sign Up</button>
-  <p>Already have an account? <a href="Login_page.html">Login</a></p>
+
+  <!-- 🔽 ROLE DROPDOWN -->
+  <select id="role">
+    <option value="">Select Role</option>
+    <option value="citizen">Citizen</option>
+    <option value="admin">Admin</option>
+    <option value="officer">Officer</option>
+  </select>
+
+  <button id="signupBtn">Sign Up</button>
+
+  <p>Already have an account?
+    <a href="Login_page.html">Login</a>
+  </p>
 </div>
 
+<!-- ✅ SIGNUP SCRIPT -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-  };
+  // 🔐 IMPORT SHARED FIREBASE INSTANCES
+  import { auth, db } from "../firebase.js";   // adjust path if needed
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  // 🔹 AUTH FUNCTIONS ONLY
+  import {
+    createUserWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  window.signup = async () => {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+  // 🔹 FIRESTORE FUNCTIONS ONLY
+  import {
+    doc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    if (!name || !email || !password) { alert("Fill all fields"); return; }
+  // ELEMENTS
+  const signupBtn = document.getElementById("signupBtn");
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const roleInput = document.getElementById("role");
+
+  signupBtn.addEventListener("click", async () => {
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const role = roleInput.value;
+
+    if (!name || !email || !password || !role) {
+      alert("Please fill all fields");
+      return;
+    }
 
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
-      // 🔥 CRITICAL: Assigning 'citizen' role by default in Firestore
-      await setDoc(doc(db, "users", res.user.uid), {
-        uid: res.user.uid,
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // 🔥 SAVE USER DATA
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        uid: userCred.user.uid,
         name: name,
         email: email,
-        role: "citizen" 
+        role: role,
+        createdAt: new Date()
       });
 
-      alert("Account created! Please Login.");
-      window.location.href = "Login_page.html";
-    } catch (err) { alert(err.message); }
-  };
+      alert("Account created successfully!");
+
+      // 🔀 ROLE-BASED REDIRECT
+      if (role === "admin") {
+        window.location.href = "../Admin/Admin_dashboard.html";
+      } else if (role === "officer") {
+        window.location.href = "../Officer/Officer_dashboard.html";
+      } else {
+        window.location.href = "../Citizen/Citizen_dashboard.html";
+      }
+
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
 </script>
 </body>
 </html>
