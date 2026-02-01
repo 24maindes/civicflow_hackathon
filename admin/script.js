@@ -1,25 +1,24 @@
-// Keep your existing imports exactly as they are
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, onSnapshot, query, where, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// ✅ IMPORT SHARED FIREBASE INSTANCES (ONLY SOURCE OF INITIALIZATION)
+import { auth, db } from "../firebase.js"; // adjust path if needed
 
-// Your current config is correct
-const firebaseConfig = {
-  apiKey: "AIzaSyB72IUqfi0iBLZfkMYlYejToOaL13wB2wc",
-  authDomain: "civicflow-17d38.firebaseapp.com",
-  projectId: "civicflow-17d38",
-  storageBucket: "civicflow-17d38.firebasestorage.app",
-  messagingSenderId: "1040325288838",
-  appId: "1:1040325288838:web:6bf24f9147a62beee38207"
-};
+// ✅ KEEP FIREBASE FEATURE IMPORTS (NO initializeApp, NO getAuth, NO getFirestore)
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- INITIALIZATION BLOCK ---
-// This MUST stay here at the top level to be accessible by all functions below
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app); // Initialized here for use in onAuthStateChanged
-const db = getFirestore(app);
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  getDocs,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 1. FIXED REDIRECT: Points to the signup folder
+// --------------------------------------------------
+// 1. AUTH REDIRECT (LOGIC UNCHANGED)
+// --------------------------------------------------
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     if (!window.location.pathname.includes("SignIn_Page")) {
@@ -28,7 +27,9 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// 2. FIXED BUTTONS (Existing Logic Unchanged)
+// --------------------------------------------------
+// 2. MODAL + FORM LOGIC (UNCHANGED)
+// --------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("mappingModal");
   const openBtn = document.getElementById("openModalBtn");
@@ -54,11 +55,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (mappingForm) {
     mappingForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const category = document.getElementById("category").value.trim();
       const department = document.getElementById("department").value.trim();
 
       try {
-        const q = query(collection(db, "grievances"), where("category", "==", category));
+        const q = query(
+          collection(db, "grievances"),
+          where("category", "==", category)
+        );
+
         const querySnapshot = await getDocs(q);
         const batch = writeBatch(db);
 
@@ -77,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Mapping successful!");
         modal.style.display = "none";
         mappingForm.reset();
+
       } catch (err) {
         alert("Error: " + err.message);
       }
@@ -84,8 +91,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// 3. TABLE SYNC (Existing Logic Unchanged)
+// --------------------------------------------------
+// 3. REAL-TIME TABLE SYNC (UNCHANGED)
+// --------------------------------------------------
 const tableBody = document.getElementById("mappingTableBody");
+
 onSnapshot(collection(db, "grievances"), (snapshot) => {
   if (tableBody) {
     tableBody.innerHTML = "";
