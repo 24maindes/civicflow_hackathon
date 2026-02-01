@@ -3,21 +3,39 @@
   font-family: Arial, sans-serif;
 }
 
+
 body {
   background: #e9ebec;
   margin: 0;
   padding: 30px;
 }
 
+
 .page-title {
   text-align: center;
   margin-bottom: 30px;
+  position: relative;
 }
+
+
+.logout-link {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 
 .title-main {
   font-size: 32px;
   font-weight: 700;
 }
+
 
 .title-sub {
   font-size: 14px;
@@ -25,33 +43,39 @@ body {
   text-transform: uppercase;
 }
 
+
 .main-container {
   display: flex;
   justify-content: center;
-  padding: 0 40px; /* This ensures the 40px margin on left and right */
+  padding: 0 40px;
   width: 100%;
 }
 
+
 .dashboard-container {
-  width: 100%; /* Changed from 80% to 100% to fill the space */
-  max-width: 100%; /* Ensures it doesn't shrink */
+  width: 100%;
+  max-width: 100%;
   background: white;
   border-radius: 8px;
   box-shadow: 0 6px 15px rgba(0,0,0,.12);
-  margin-bottom: 40px; /* Optional: adds 40px at the bottom too */
+  margin-bottom: 40px;
 }
+
+
 .dashboard-header {
   background: #f7931e;
   color: white;
   padding: 20px;
   display: flex;
   justify-content: space-between;
-  align-self: center;
+  align-items: center;
 }
+
 
 .section-title {
   padding: 20px;
 }
+
 
 table {
   width: 95%;
@@ -59,15 +83,18 @@ table {
   border-collapse: collapse;
 }
 
+
 th, td {
   border: 1px solid #ddd;
   padding: 12px;
 }
 
+
 thead {
   background: #5f6b7a;
   color: white;
 }
+
 
 .add-btn {
   margin: 20px auto;
@@ -80,23 +107,28 @@ thead {
   cursor: pointer;
 }
 
-/* MODAL */
+
+/* MODAL LOGIC */
 .modal {
-  display: none;
+  display: none; /* Controlled by JS */
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
+
 
 .modal-content {
   background: white;
-  width: 380px;
-  padding: 25px;
-  border-radius: 10px;
-  position: relative;
+  padding: 30px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
+
 
 .close-btn {
   position: absolute;
@@ -106,17 +138,20 @@ thead {
   font-size: 22px;
 }
 
+
 .mapping-form {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
+
 .mapping-form input {
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
+
 
 .save-btn {
   background: #1976d2;

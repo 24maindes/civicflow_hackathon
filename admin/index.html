@@ -4,60 +4,69 @@
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+      }
+    }
+  </script>
 </head>
 <body>
 
+
 <div class="page-title">
   <span class="title-main">Admin Dashboard</span>
-  <span class="title-sub">Centralized Grievance Management</span>
+  <span class="title-sub">CENTRALIZED GRIEVANCE MANAGEMENT</span>
+  <button id="logoutBtn" class="logout-link">Logout</button>
 </div>
+
 
 <div class="main-container">
   <div class="dashboard-container">
-
     <div class="dashboard-header">
       <h2>Admin Dashboard</h2>
-      <img src="admin_image.jpg" height="60" width="60">
+      <div style="background:#fff; border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; color:#f7931e; font-weight:bold;">AD</div>
     </div>
 
+
     <h3 class="section-title">Manage Department Mapping</h3>
+
 
     <table>
       <thead>
         <tr>
           <th>Category</th>
           <th>Department</th>
+          <th>SLA (Deadline)</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody id="mappingTableBody"></tbody>
     </table>
 
+
     <button class="add-btn" id="openModalBtn">Add New Mapping</button>
   </div>
 </div>
 
-<!-- MODAL -->
+
 <div class="modal" id="mappingModal">
   <div class="modal-content">
     <span class="close-btn" id="closeModalBtn">&times;</span>
-
     <h3 class="modal-title">Add Department Mapping</h3>
-
     <form id="mappingForm" class="mapping-form">
       <label>Category</label>
       <input type="text" id="category" required placeholder="e.g. Road">
-
       <label>Department</label>
       <input type="text" id="department" required placeholder="e.g. PWD">
-
       <button type="submit" class="save-btn">Save Mapping</button>
     </form>
   </div>
 </div>
+
 
 <script type="module" src="./script.js"></script>
 </body>
