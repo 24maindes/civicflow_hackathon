@@ -5,66 +5,28 @@
   <title>CivicFlow Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #bde7f3;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .box {
-      background: #e3f2fd;
-      padding: 3rem;
-      border-radius: 16px;
-      width: 420px;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
+    body { font-family: 'Poppins', sans-serif; background: #bde7f3; height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
+    .box { background: #e3f2fd; padding: 3rem; border-radius: 16px; width: 420px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
     h2 { color: #ff6600; }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #ff6600;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #ff6600; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
     button:hover { background: #e65c00; }
   </style>
 </head>
-
 <body>
 <div class="box">
   <h2>🔑 CivicFlow</h2>
   <p>Login</p>
-
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
-
   <button onclick="login()">Login</button>
-
-  <p>Don’t have an account?
-    <a href="SignIn_page.html">Sign Up</a>
-  </p>
+  <p>Don’t have an account? <a href="SignIn_page.html">Sign Up</a></p>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
-  from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc } 
-  from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
@@ -76,30 +38,34 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // 🔁 If already logged in → redirect
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      window.location.href = "Personal_details.html";
-    }
-  });
-
   window.login = async () => {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
+      
+      // 🕵️ Fetch user role from Firestore
       const snap = await getDoc(doc(db, "users", userCred.user.uid));
 
       if (snap.exists()) {
-        alert("Welcome " + snap.data().name);
-        window.location.href = "Personal_details.html";
+        const userData = snap.data();
+        const role = userData.role;
+
+        alert("Welcome " + userData.name);
+
+        // 🚀 SWITCHBOARD: Send user to the right page
+        if (role === "admin") {
+          window.location.href = "Admin_dashboard.html";
+        } else if (role === "officer") {
+          window.location.href = "Officer_dashboard.html";
+        } else {
+          window.location.href = "Citizen_dashboard.html";
+        }
       } else {
-        alert("User profile not found");
+        alert("User profile not found in database.");
       }
-    } catch (err) {
-      alert(err.message);
-    }
+    } catch (err) { alert(err.message); }
   };
 </script>
 </body>
