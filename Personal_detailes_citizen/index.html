@@ -53,8 +53,19 @@
     <input type="text" id="location" placeholder="City/Location" required>
     <input type="email" id="email" placeholder="Email Address" required>
     <input type="password" id="password" placeholder="Password">
-    <button onclick="submitDetails()">Go to Dashboard</button>
-</div>
+     <button onclick="Go_to_Dashboard()">Go to Dashbboard</button>
+
+<script>
+  function Go_to_Dashboard() {
+    // Redirect to your Citizen page folder
+    window.location.href = "../citizen/index.html";  
+    // 👆 Adjust the path depending on your folder structure
+  }
+</script>
+</div> 
+
+
+
 
 <script type="module">
     import { auth, db } from "./firebase.js";

@@ -67,7 +67,7 @@
 <!-- Sign Up Button -->
 <button id="signupBtn">Sign Up</button>
 
-<script>
+ <script>
   const signupBtn = document.getElementById("signupBtn");
   const roleInput = document.getElementById("role");
 
@@ -90,7 +90,7 @@
       alert("Invalid role selected.");
     }
   });
-</script>
+</script>  
 
   <p>Already have an account?
     <a href="../LogIn_Page/index.html">Log In</a>
@@ -139,15 +139,6 @@
       });
 
       alert("Account created successfully!");
-
-      // 🔀 ROLE-BASED REDIRECT
-      if (role === "admin") {
-        window.location.href = "../Personal_detailes_admin/index.html";
-      } else if (role === "officer") {
-        window.location.href = "../Personal_detailes_officer/index.html";
-      } else {
-        window.location.href = "../Personal_detailes_citizen/index.html";
-      }
 
     } catch (err) {
       alert(err.message);

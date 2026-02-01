@@ -87,7 +87,16 @@
       <span class="label">CURRENT STATION / LOCATION</span>
       <input type="text" id="location" placeholder="City / Station" required>
 
-      <button type="submit">Complete & Go to Officer Dashboard</button>
+
+       <button onclick="submit()">Complete & Go to Officer Dashboard</button>
+
+<script>
+  function submit() {
+    // Redirect to your Citizen page folder
+    window.location.href = "../officerupdate/index.html";  
+    // 👆 Adjust the path depending on your folder structure
+  }
+</script>
     </form>
   </div>
 
