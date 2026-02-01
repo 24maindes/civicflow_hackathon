@@ -16,7 +16,7 @@ import {
   writeBatch
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// --------------------------------------------------
+ //--------------------------------------------------
 // 1. AUTH REDIRECT (LOGIC UNCHANGED)
 // --------------------------------------------------
 onAuthStateChanged(auth, (user) => {
@@ -27,6 +27,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+  
 // --------------------------------------------------
 // 2. MODAL + FORM LOGIC (UNCHANGED)
 // --------------------------------------------------

@@ -107,6 +107,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 
 const tableBody = document.getElementById("complaintsTable");
 
+<<<<<<< HEAD
 onAuthStateChanged(auth, async (user) => {
     // If user is not logged in
     if (!user) {
@@ -123,7 +124,34 @@ onAuthStateChanged(auth, async (user) => {
         alert("Unauthorized access!");
         window.location.href = "../LogIn_Page/index.html";
         return;
+=======
+async function loadDashboard(user) {
+    const userDocRef = doc(db, "users", user.uid);
+
+    // ✅ Wait until the Firestore user document exists (max 5 attempts)
+    let userDoc;
+    let attempts = 0;
+    while (attempts < 5) {
+        userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) break;
+        await new Promise(r => setTimeout(r, 500)); // wait 0.5s
+        attempts++;
+>>>>>>> 682c18099c6d88a716caa8abfa61fb74b592dd08
     }
+     if (!user) {
+    if (!window.location.pathname.includes("SignIn_Page")) {
+      window.location.href = "../SignIn_Page/index.html";
+    }
+  }
+};
+
+    if (!userDoc.exists() || userDoc.data().role !== "officer") {
+        alert("Unauthorized access or user data not ready yet!");
+        window.location.href = "../SignIn_Page/index.html";
+        return;
+
+    }
+   
 
     const officerDept = userDoc.data().department || "General Dept";
     const q = query(collection(db, "complaints"), where("department", "==", officerDept));
@@ -149,15 +177,30 @@ onAuthStateChanged(auth, async (user) => {
             `;
         });
     });
+
+
+// ✅ Trigger dashboard after auth state is ready
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "../SignIn_Page/index.html";
+        return;
+    }
+    loadDashboard(user);
 });
 
+<<<<<<< HEAD
 
+=======
+// Bottom buttons
+>>>>>>> 682c18099c6d88a716caa8abfa61fb74b592dd08
 window.goToUpdate = (id) => { window.location.href = `officerUpdate.html?id=${id}`; };
 window.goBack = () => { window.history.back(); };
 window.logoutUser = async () => {
     await signOut(auth);
-    window.location.href = "login.html";
+    window.location.href = "../SignIn_Page/index.html";
 };
 </script>
+
+
 </body>
 </html>
