@@ -1,8 +1,7 @@
 // ---------- IMPORT FIREBASE ----------
-// Make sure this file is loaded as type="module" in your HTML:
-// <script type="module" src="script.js"></script>
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ---------- FIREBASE CONFIG ----------
 const firebaseConfig = {
@@ -17,6 +16,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth();
+
+// ---------- AUTH CHECK ----------
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // Redirect to SignIn page if not logged in
+    if (!window.location.pathname.includes("SignIn_Page")) {
+      window.location.href = "../SignIn_Page/index.html";
+    }
+  }
+});
 
 // ---------- ELEMENTS ----------
 const submitChoice = document.getElementById("submitChoice");
