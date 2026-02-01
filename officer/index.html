@@ -116,7 +116,7 @@ onAuthStateChanged(auth, async (user) => {
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists() || userDoc.data().role !== "officer") {
         alert("Unauthorized access!");
-        window.location.href = "login.html";
+        window.location.href = "../SignIn_Page/index.html";
         return;
     }
 
