@@ -119,6 +119,12 @@ async function loadDashboard(user) {
         await new Promise(r => setTimeout(r, 500)); // wait 0.5s
         attempts++;
     }
+     if (!user) {
+    if (!window.location.pathname.includes("SignIn_Page")) {
+      window.location.href = "../SignIn_Page/index.html";
+    }
+  }
+};
 
     if (!userDoc.exists() || userDoc.data().role !== "officer") {
         alert("Unauthorized access or user data not ready yet!");
@@ -126,12 +132,7 @@ async function loadDashboard(user) {
         return;
 
     }
-    if (!user) {
-    if (!window.location.pathname.includes("SignIn_Page")) {
-      window.location.href = "../SignIn_Page/index.html";
-    }
-  }
-};
+   
 
     const officerDept = userDoc.data().department || "General Dept";
     const q = query(collection(db, "complaints"), where("department", "==", officerDept));
