@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>CivicFlow Sign Up</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -62,10 +63,16 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } 
-  from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-  import { getFirestore, doc, setDoc } 
-  from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+  import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    onAuthStateChanged 
+  } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc 
+  } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
@@ -90,24 +97,28 @@
     const password = document.getElementById("password").value;
 
     if (!name || !email || !password) {
-      alert("Fill all fields");
+      alert("Please fill all fields");
       return;
     }
 
     try {
-      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      const user = res.user;
 
-      await setDoc(doc(db, "users", userCred.user.uid), {
+      // 🔐 Default role assigned (admin can change later)
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
         name: name,
         email: email,
-        role: "citizen"
+        role: "citizen",
+        status: "pending"   // optional: admin approval
       });
 
-      alert("Signup successful! Please login.");
+      alert("Signup successful! Await admin approval.");
       window.location.href = "LogIn_Page.html";
 
-    } catch (err) {
-      alert(err.message);
+    } catch (error) {
+      alert(error.message);
     }
   };
 </script>
